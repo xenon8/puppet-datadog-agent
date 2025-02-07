@@ -46,12 +46,8 @@
 #   $puppetmaster_user
 #       Will chown the api key used by the report processor to this user.
 #       Defaults to the user the puppetmaster is configured to run as.
-#   $non_local_traffic
-#       Enable you to use the agent as a proxy. Defaults to false.
-#       See https://github.com/DataDog/dd-agent/wiki/Proxy-Configuration
-#   $dogstreams
-#       Optional array of logs to parse and custom parsers to use.
-#       See https://github.com/DataDog/dd-agent/blob/ed5e698/datadog.conf.example#L149-L178
+#   $dogstatsd_non_local_traffic
+#       Set to true to make DogStatsD listen to non local UDP traffic.
 #   $log_level
 #       Set value of 'log_level' variable. Default is 'info' as in dd-agent.
 #       Valid values here are: critical, debug, error, fatal, info, warn and warning.
@@ -82,8 +78,6 @@
 #   $manage_install
 #       Boolean to indicate whether this module should attempt to install the
 #       Agent, or assume it will be installed by other means. Default true.
-#   $graphite_listen_port
-#       Set graphite listener port
 #   $extra_template
 #       Optional, append this extra template file at the end of
 #       the default datadog.conf template
@@ -92,14 +86,6 @@
 #       separate way of adding keys.
 #   $skip_ssl_validation
 #       Skip SSL validation.
-#   $use_curl_http_client
-#       Uses the curl HTTP client for the forwarder
-#   $recent_point_threshold
-#       Sets the threshold for accepting points.
-#   String. Default: empty (30 second intervals)
-#   $listen_port
-#       Change the port that the agent listens on
-#       String. Default: empty (port 17123 in dd-agent)
 #   $additional_checksd
 #       Additional directory to look for datadog checks in
 #       String. Default: undef
@@ -127,13 +113,6 @@
 #   $dogstatsd_port
 #       Specifies the port to be used by dogstatsd. Must have use_dogstatsd set
 #       String. Default: 8125
-#   $dogstatsd_target
-#       Change the target to be used by dogstatsd. Must have use_dogstatsd set
-#       set
-#       String. Default: empty
-#   $dogstatsd_interval
-#       Change the dogstatsd flush period. Must have use_dogstatsd set
-#       String. Default: empty ( 10 second interval)
 #   $dogstatsd_normalize
 #       Enables 1 second nomralization. Must have use_dogstatsd set
 #       Boolean. Default: true
@@ -147,26 +126,8 @@
 #   $device_blacklist_re
 #       Specifies pattern for device blacklisting.
 #       String. Default: empty
-#   $ganglia_host
-#       Specifies host where gmetad is running
-#       String. Default: empty
-#   $ganglia_port
-#       Specifies port  for $ganglia_host
-#       String. Default: empty
-#   $dogstreams
-#       Specifies port for list of logstreams/modules to be used.
-#       String. Default: empty
-#   $custom_emitters
-#       Specifies a comma seperated list of non standard emitters to be used
-#       String. Default: empty
 #   $agent_log_file
 #       Specifies the log file location (Agent 6 and 7 only).
-#       String. Default: empty
-#   $collector_log_file
-#       Specifies the log file location for the collector system
-#       String. Default: empty
-#   $forwarder_log_file
-#       Specifies the log file location for the forwarder system
 #       String. Default: empty
 #   $dogstatsd
 #       Specifies the log file location for the dogstatsd system
@@ -183,12 +144,6 @@
 #   $apm_non_local_traffic
 #       Accept non local apm traffic. Defaults to false.
 #       Boolean. Default: false
-#   $apm_analyzed_spans
-#       Hash defining the APM spans to analyze and their rates.
-#       Optional Hash. Default: undef.
-#   $apm_obfuscation
-#       Hash defining obfuscation rules for sensitive data. (Agent 6 and 7 only).
-#       Optional Hash. Default: undef
 #   $apm_filter_tags
 #       Hash defining filter rules for traces. (Agent 6 and 7 only).
 #       Optional Hash. Default: undef
@@ -276,13 +231,13 @@
 #
 class datadog_agent (
   String $dd_url = '',
-  String $datadog_site = $datadog_agent::params::datadog_site,
-  String $host = '',
+  String $datadog_site = $datadog_agent::params::datadog_site, # => site
+  String $host = '', # => hostname
   String $api_key = 'your_API_key',
   Enum['datadog-agent', 'Datadog Agent', 'datadog-iot-agent'] $agent_flavor = $datadog_agent::params::package_name,
   Boolean $collect_ec2_tags = false,
   Boolean $collect_gce_tags = false,
-  Boolean $collect_instance_metadata = true,
+  Boolean $collect_instance_metadata = true, # => enable_metadata_collection
   Array $tags = [],
   Hash $integrations = {},
   Boolean $hiera_integrations = false,
@@ -293,8 +248,7 @@ class datadog_agent (
   String $reports_url = "https://api.${datadog_site}",
   String $puppetmaster_user = $settings::user,
   String $puppet_gem_provider = $datadog_agent::params::gem_provider,
-  Boolean $non_local_traffic = false,
-  Array $dogstreams = [],
+  Boolean $dogstatsd_non_local_traffic = false,
   String $log_level = 'info',
   Boolean $log_to_syslog = true,
   String $service_ensure = 'running',
@@ -316,15 +270,9 @@ class datadog_agent (
   Optional[Variant[Integer, Pattern[/^\d*$/]]] $proxy_port = undef,
   Optional[String] $proxy_user = undef,
   Optional[String] $proxy_password = undef,
-  Variant[Stdlib::Port, Pattern[/^\d*$/]] $graphite_listen_port = '',
   String $extra_template = '',
-  String $ganglia_host = '',
-  Integer $ganglia_port = 8651,
   Boolean $skip_ssl_validation = false,
   Boolean $skip_apt_key_trusting = false,
-  Boolean $use_curl_http_client = false,
-  String $recent_point_threshold = '',
-  Variant[Stdlib::Port, Pattern[/^\d*$/]] $listen_port = '',
   Optional[String] $additional_checksd = undef,
   String $bind_host = '',
   Boolean $use_pup = false,
@@ -332,36 +280,23 @@ class datadog_agent (
   String $pup_interface = '',
   String $pup_url = '',
   Boolean $use_dogstatsd = true,
-  String $dogstatsd_target = '',
-  String $dogstatsd_interval = '',
-  Boolean $dogstatsd_normalize = true,
-  String $device_blacklist_re = '',
-  String $custom_emitters = '',
-  String $agent_log_file = $datadog_agent::params::agent_log_file,
-  String $collector_log_file = '',
-  String $forwarder_log_file = '',
+  String $agent_log_file = $datadog_agent::params::agent_log_file, # => log_file
   String $dogstatsd_log_file = '',
   String $pup_log_file = '',
-  String $syslog_host  = '',
-  Variant[Stdlib::Port, Pattern[/^\d*$/]] $syslog_port  = '',
-  String $service_discovery_backend = '',
-  String $sd_config_backend = '',
-  String $sd_backend_host = '',
-  Integer $sd_backend_port = 0,
-  String $sd_template_dir = '',
-  Boolean $sd_jmx_enable = false,
-  String $consul_token = '',
+  # String $service_discovery_backend = '', # TODO: update this with autodiscovery
+  # String $sd_config_backend = '',
+  # String $sd_backend_host = '',
+  # Integer $sd_backend_port = 0,
+  # String $sd_template_dir = '',
+  # Boolean $sd_jmx_enable = false,
   Integer $cmd_port = 5001,
   Optional[Integer] $agent_major_version = undef,
-  Optional[String] $conf_dir = undef,
-  Boolean $conf_dir_purge = $datadog_agent::params::conf_dir_purge,
+  Optional[String] $confd_path = undef, # => confd_path
   String $dd_group = $datadog_agent::params::dd_group,
   Any $dd_groups = $datadog_agent::params::dd_groups,
   Boolean $apm_enabled = $datadog_agent::params::apm_default_enabled,
   String $apm_env = 'none',
   Boolean $apm_non_local_traffic = false,
-  Optional[Hash[String, Float[0, 1]]] $apm_analyzed_spans = undef,
-  Optional[Hash[String, Data]] $apm_obfuscation = undef,
   Optional[Hash[String, Data]] $apm_filter_tags = undef,
   Optional[Hash[String, Data]] $apm_filter_tags_regex = undef,
   Boolean $process_enabled = $datadog_agent::params::process_default_enabled,
@@ -370,7 +305,7 @@ class datadog_agent (
   Boolean $logs_enabled = $datadog_agent::params::logs_enabled,
   Optional[Integer] $logs_open_files_limit = $datadog_agent::params::logs_open_files_limit,
   Boolean $container_collect_all = $datadog_agent::params::container_collect_all,
-  Hash[String[1], Data] $agent_extra_options = {},
+  Hash[String[1], Data] $agent_extra_options = {}, # TODO: double-check
   Optional[String] $agent_repo_uri = undef,
   Optional[Boolean] $rpm_repo_gpgcheck = undef,
   # TODO: $use_apt_backup_keyserver, $apt_backup_keyserver and $apt_keyserver can be
@@ -429,14 +364,8 @@ class datadog_agent (
     $dd_user = $datadog_agent::params::dd_user
   }
 
-  if $conf_dir == undef {
-    if $_agent_major_version == 5 {
-      $_conf_dir = $datadog_agent::params::legacy_conf_dir
-    } else {
-      $_conf_dir = $datadog_agent::params::conf_dir
-    }
-  } else {
-    $_conf_dir = $conf_dir
+  if $confd_path == undef {
+    $_confd_path = $confd_path
   }
 
   if $hiera_tags {
@@ -671,11 +600,9 @@ class datadog_agent (
       require => Package[$agent_flavor],
     }
 
-    file { $_conf_dir:
+    file { $_confd_path:
       ensure  => directory,
-      purge   => $conf_dir_purge,
       recurse => true,
-      force   => $conf_dir_purge,
       owner   => $dd_user,
       group   => $dd_group,
       notify  => Service[$datadog_agent::params::service_name],
@@ -725,14 +652,6 @@ class datadog_agent (
       }
     }
 
-    if ($apm_enabled == true) and (($apm_env != 'none') or $apm_analyzed_spans or $apm_obfuscation) {
-      concat::fragment { 'datadog apm footer':
-        target  => '/etc/dd-agent/datadog.conf',
-        content => template('datadog_agent/datadog_apm_footer.conf.erb'),
-        order   => '07',
-      }
-    }
-
     if ($process_enabled == true) {
       concat::fragment { 'datadog process agent footer':
         target  => '/etc/dd-agent/datadog.conf',
@@ -749,20 +668,6 @@ class datadog_agent (
       require => File['/etc/dd-agent'],
     }
   } else { #Agent 6/7
-
-    # notify of broken params on agent6/7
-    if !empty($proxy_host) {
-      notify { 'Setting proxy_host is only used with Agent 5. Please use agent_extra_options to set your proxy': }
-    }
-    if !empty($proxy_port) {
-      notify { 'Setting proxy_port is only used with Agent 5. Please use agent_extra_options to set your proxy': }
-    }
-    if !empty($proxy_user) {
-      notify { 'Setting proxy_user is only used with Agent 5. Please use agent_extra_options to set your proxy': }
-    }
-    if !empty($proxy_password) {
-      notify { 'Setting proxy_password is only used with Agent 5. Please use agent_extra_options to set your proxy': }
-    }
 
     # lint:ignore:quoted_booleans
     $process_enabled_str = $process_enabled ? { true => 'true' , default => 'disabled' }
@@ -800,26 +705,6 @@ class datadog_agent (
       $host_config = {
         'hostname' => $host,
       }
-    }
-
-    if $apm_analyzed_spans {
-      $apm_analyzed_span_config = {
-        'apm_config' => {
-          'analyzed_spans' => $apm_analyzed_spans,
-        },
-      }
-    } else {
-      $apm_analyzed_span_config = {}
-    }
-
-    if $apm_obfuscation {
-      $apm_obfuscation_config = {
-        'apm_config' => {
-          'obfuscation' => $apm_obfuscation,
-        },
-      }
-    } else {
-      $apm_obfuscation_config = {}
     }
 
     if $apm_filter_tags {
@@ -869,8 +754,6 @@ class datadog_agent (
       $base_extra_config,
       $logs_base_config,
       $agent_extra_options,
-      $apm_analyzed_span_config,
-      $apm_obfuscation_config,
       $apm_filter_tags_config,
       $apm_filter_tags_regex_config,
       $statsd_forward_config,
@@ -878,17 +761,15 @@ class datadog_agent (
       $additional_checksd_config
     )
 
-    file { $_conf_dir:
+    file { $_confd_path:
       ensure  => directory,
-      purge   => $conf_dir_purge,
       recurse => true,
-      force   => $conf_dir_purge,
       owner   => $dd_user,
       group   => $dd_group,
     }
 
     if ! $_agent_managed_by_installer {
-      File[$_conf_dir] ~> Service[$datadog_agent::params::service_name]
+      File[$_confd_path] ~> Service[$datadog_agent::params::service_name]
     }
 
     $_local_tags = datadog_agent::tag6($local_tags, false, undef)
@@ -903,11 +784,11 @@ class datadog_agent (
       'hostname_fqdn' => $hostname_fqdn,
       'collect_ec2_tags' => $collect_ec2_tags,
       'collect_gce_tags' => $collect_gce_tags,
-      'confd_path' => $_conf_dir,
+      'confd_path' => $confd_path,
       'enable_metadata_collection' => $collect_instance_metadata,
       'dogstatsd_port' => $dogstatsd_port,
       'dogstatsd_socket' => $dogstatsd_socket,
-      'dogstatsd_non_local_traffic' => $non_local_traffic,
+      'dogstatsd_non_local_traffic' => $dogstatsd_non_local_traffic,
       'log_file' => $agent_log_file,
       'log_level' => $log_level,
       'remote_updates' => $remote_updates,

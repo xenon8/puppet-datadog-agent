@@ -47,7 +47,7 @@ describe 'datadog_agent' do
       end
 
       it do
-        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list')\
+        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list') \
           .with_content(%r{deb\s+\[signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg\]\s+https://apt.datadoghq.com/\s+stable\s+main})
       end
     end
@@ -73,7 +73,7 @@ describe 'datadog_agent' do
       end
 
       it do
-        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list')\
+        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list') \
           .with_content(%r{deb\s+\[signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg\]\s+https://apt.datadoghq.com/\s+stable\s+6})
       end
     end
@@ -99,7 +99,7 @@ describe 'datadog_agent' do
       end
 
       it do
-        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list')\
+        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list') \
           .with_content(%r{deb\s+\[signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg\]\s+https://apt.datadoghq.com/\s+stable\s+7})
       end
     end
@@ -125,7 +125,7 @@ describe 'datadog_agent' do
       end
 
       it do
-        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list')\
+        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list') \
           .with_content(%r{deb\s+\[signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg\]\s+https://apt.datadoghq.com/\s+stable\s+6})
       end
     end
@@ -151,7 +151,7 @@ describe 'datadog_agent' do
       end
 
       it do
-        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list')\
+        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list') \
           .with_content(%r{deb\s+\[signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg\]\s+https://apt.datadoghq.com/\s+stable\s+6})
       end
     end
@@ -177,7 +177,7 @@ describe 'datadog_agent' do
       end
 
       it do
-        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list')\
+        is_expected.to contain_file('/etc/apt/sources.list.d/datadog.list') \
           .with_content(%r{deb\s+\[signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg\]\s+https://apt.datadoghq.com/\s+stable\s+6})
       end
     end
@@ -425,7 +425,7 @@ describe 'datadog_agent' do
                 }
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^non_local_traffic: false\n},
+                    'content' => %r{^dogstatsd_non_local_traffic: false\n},
                   )
                 }
                 it {
@@ -440,32 +440,7 @@ describe 'datadog_agent' do
                 }
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{# recent_point_threshold: 30\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# listen_port: 17123\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# graphite_listen_port: 17124\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{# additional_checksd: /etc/dd-agent/checks.d/\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^use_curl_http_client: false\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# device_blacklist_re: .*\\/dev\\/mapper\\/lxc-box.*\n},
                   )
                 }
               end
@@ -511,40 +486,12 @@ describe 'datadog_agent' do
                 }
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{# dogstatsd_target: http://localhost:17123\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# dogstatsd_interval: 10\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^dogstatsd_normalize: yes\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{^# statsd_forward_host: address_of_own_statsd_server\n},
                   )
                 }
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{^# statsd_forward_port: 8125\n},
-                  )
-                }
-              end
-
-              context 'for ganglia' do
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# ganglia_host: localhost\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# ganglia_port: 8651\n},
                   )
                 }
               end
@@ -562,32 +509,12 @@ describe 'datadog_agent' do
                 }
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{# collector_log_file: /var/log/datadog/collector.log\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{# forwarder_log_file: /var/log/datadog/forwarder.log\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{# dogstatsd_log_file: /var/log/datadog/dogstatsd.log\n},
                   )
                 }
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with
                   # 'content' => %r{# pup_log_file:        /var/log/datadog/pup.log\n},
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# syslog_host:\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^# syslog_port:\n},
-                  )
                 }
               end
 
@@ -615,11 +542,6 @@ describe 'datadog_agent' do
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').without(
                     'content' => %r{^sd_template_dir:\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').without(
-                    'content' => %r{^consul_token:\n},
                   )
                 }
                 it {
@@ -737,20 +659,6 @@ describe 'datadog_agent' do
                   )
                 }
               end
-              context 'with non_local_traffic set to true' do
-                let(:params) do
-                  {
-                    non_local_traffic: true,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^non_local_traffic: true\n},
-                  )
-                }
-              end
               # Should expand testing to cover changes to the case upcase
               context 'with log level set to critical' do
                 let(:params) do
@@ -836,76 +744,6 @@ describe 'datadog_agent' do
                   )
                 }
               end
-              context 'with recent_point_threshold set to 60' do
-                let(:params) do
-                  {
-                    recent_point_threshold: '60',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^recent_point_threshold: 60\n},
-                  )
-                }
-              end
-              context 'with a custom port set to 17125' do
-                let(:params) do
-                  {
-                    listen_port: '17125',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^listen_port: 17125\n},
-                  )
-                }
-              end
-              context 'with a custom port set to 17125, specified as an integer' do
-                let(:params) do
-                  {
-                    listen_port: 17_125,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^listen_port: 17125\n},
-                  )
-                }
-              end
-              context 'listening for graphite data on port 17124' do
-                let(:params) do
-                  {
-                    graphite_listen_port: '17124',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^graphite_listen_port: 17124\n},
-                  )
-                }
-              end
-              context 'listening for graphite data on port 17124, port specified as an integer' do
-                let(:params) do
-                  {
-                    graphite_listen_port: 17_124,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^graphite_listen_port: 17124\n},
-                  )
-                }
-              end
               context 'with configuration for a custom checks.d' do
                 let(:params) do
                   {
@@ -945,20 +783,6 @@ describe 'datadog_agent' do
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{additional_checksd: /etc/dd-agent/checks_custom.d\n},
-                  )
-                }
-              end
-              context 'with using the Tornado HTTP client' do
-                let(:params) do
-                  {
-                    use_curl_http_client: true,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^use_curl_http_client: true\n},
                   )
                 }
               end
@@ -1102,62 +926,6 @@ describe 'datadog_agent' do
                   )
                 }
               end
-              context 'with dogstatsd_target set to localhost:17124' do
-                let(:params) do
-                  {
-                    dogstatsd_target: 'http://localhost:17124',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{dogstatsd_target: http://localhost:17124\n},
-                  )
-                }
-              end
-              context 'with dogstatsd_interval set to 5' do
-                let(:params) do
-                  {
-                    dogstatsd_interval: '5',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^dogstatsd_interval: 5\n},
-                  )
-                }
-              end
-              context 'with dogstatsd_interval set to 5' do
-                let(:params) do
-                  {
-                    dogstatsd_interval: '5',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^dogstatsd_interval: 5\n},
-                  )
-                }
-              end
-              context 'with dogstatsd_normalize set to false' do
-                let(:params) do
-                  {
-                    dogstatsd_normalize: false,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^dogstatsd_normalize: no\n},
-                  )
-                }
-              end
               context 'with statsd_forward_host set to localhost:3958' do
                 let(:params) do
                   {
@@ -1228,41 +996,7 @@ describe 'datadog_agent' do
                   )
                 }
               end
-              context 'with ganglia_host set to localhost and ganglia_port set to 12345' do
-                let(:params) do
-                  {
-                    ganglia_host: 'testhost',
-                    ganglia_port: '12345',
-                    agent_major_version: 5,
-                  }
-                end
 
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^ganglia_port: 12345\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^ganglia_host: testhost\n},
-                  )
-                }
-              end
-              context 'with ganglia_host set to localhost and ganglia_port set to 12345, port specified as an integer' do
-                let(:params) do
-                  {
-                    ganglia_host: 'testhost',
-                    ganglia_port: 12_345,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^ganglia_port: 12345\n},
-                  )
-                }
-              end
               context 'with dogstreams set to /path/to/log1:/path/to/parser' do
                 let(:params) do
                   {
@@ -1274,76 +1008,6 @@ describe 'datadog_agent' do
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{dogstreams: /path/to/log1:/path/to/parser\n},
-                  )
-                }
-              end
-              context 'with custom_emitters set to /test/emitter' do
-                let(:params) do
-                  {
-                    custom_emitters: '/test/emitter/',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{custom_emitters: /test/emitter/\n},
-                  )
-                }
-              end
-              context 'with custom_emitters set to /test/emitter' do
-                let(:params) do
-                  {
-                    custom_emitters: '/test/emitter/',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{custom_emitters: /test/emitter/\n},
-                  )
-                }
-              end
-              context 'with collector_log_file set to /test/log' do
-                let(:params) do
-                  {
-                    collector_log_file: '/test/log',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{collector_log_file: /test/log\n},
-                  )
-                }
-              end
-              context 'with forwarder_log_file set to /test/log' do
-                let(:params) do
-                  {
-                    forwarder_log_file: '/test/log',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{forwarder_log_file: /test/log\n},
-                  )
-                }
-              end
-              context 'with forwarder_log_file set to /test/log' do
-                let(:params) do
-                  {
-                    forwarder_log_file: '/test/log',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{forwarder_log_file: /test/log\n},
                   )
                 }
               end
@@ -1372,48 +1036,6 @@ describe 'datadog_agent' do
                 it {
                   is_expected.to contain_concat__fragment('datadog footer').with(
                     'content' => %r{^pup_log_file: /test/log\n},
-                  )
-                }
-              end
-              context 'with syslog location set to localhost' do
-                let(:params) do
-                  {
-                    syslog_host: 'localhost',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^syslog_host: localhost\n},
-                  )
-                }
-              end
-              context 'with syslog port set to 8080' do
-                let(:params) do
-                  {
-                    syslog_port: '8080',
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^syslog_port: 8080\n},
-                  )
-                }
-              end
-              context 'with syslog port set to 8080, specified as an integer' do
-                let(:params) do
-                  {
-                    syslog_port: 8080,
-                    agent_major_version: 5,
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^syslog_port: 8080\n},
                   )
                 }
               end
@@ -1656,37 +1278,6 @@ describe 'datadog_agent' do
                   )
                 }
               end
-
-              context 'with data scrubbing enabled with custom sensitive_words' do
-                let(:params) do
-                  {
-                    process_enabled: true,
-                    agent_major_version: 5,
-                    custom_sensitive_words: ['consul_token', 'dd_key'],
-                  }
-                end
-
-                it {
-                  is_expected.to contain_concat__fragment('datadog footer').with(
-                    'content' => %r{^process_agent_enabled: true\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog process agent footer').with(
-                    'content' => %r{^\[process.config\]\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog process agent footer').with(
-                    'content' => %r{^scrub_args: true\n},
-                  )
-                }
-                it {
-                  is_expected.to contain_concat__fragment('datadog process agent footer').with(
-                    'content' => %r{^custom_sensitive_words: consul_token,dd_key\n},
-                  )
-                }
-              end
             end
           end
 
@@ -1780,10 +1371,10 @@ describe 'datadog_agent' do
 
           it 'adds an install_info' do
             expect(install_info['install_method']).to match(
-              'tool' => 'puppet',
-              'tool_version' => %r{^puppet-\d+\.\d+\.\d}, # puppetversion is not set in tests, this field has to be tested manually
-              'installer_version' => %r{^datadog_module-\d+\.\d+\.\d},
-            )
+                                                        'tool' => 'puppet',
+                                                        'tool_version' => %r{^puppet-\d+\.\d+\.\d}, # puppetversion is not set in tests, this field has to be tested manually
+                                                        'installer_version' => %r{^datadog_module-\d+\.\d+\.\d},
+                                                      )
           end
         end
 
@@ -1967,23 +1558,23 @@ describe 'datadog_agent' do
 
               it {
                 is_expected.to contain_notify(
-                  'Setting proxy_host is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                 'Setting proxy_host is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                               )
               }
               it {
                 is_expected.to contain_notify(
-                  'Setting proxy_port is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                 'Setting proxy_port is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                               )
               }
               it {
                 is_expected.to contain_notify(
-                  'Setting proxy_user is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                 'Setting proxy_user is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                               )
               }
               it {
                 is_expected.to contain_notify(
-                  'Setting proxy_password is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                 'Setting proxy_password is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                               )
               }
             end
             context 'deprecated proxy settings with default values' do
@@ -1998,23 +1589,23 @@ describe 'datadog_agent' do
 
               it {
                 is_expected.not_to contain_notify(
-                  'Setting proxy_host is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                     'Setting proxy_host is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                                   )
               }
               it {
                 is_expected.not_to contain_notify(
-                  'Setting proxy_port is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                     'Setting proxy_port is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                                   )
               }
               it {
                 is_expected.not_to contain_notify(
-                  'Setting proxy_user is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                     'Setting proxy_user is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                                   )
               }
               it {
                 is_expected.not_to contain_notify(
-                  'Setting proxy_password is only used with Agent 5. Please use agent_extra_options to set your proxy',
-                )
+                                     'Setting proxy_password is only used with Agent 5. Please use agent_extra_options to set your proxy',
+                                   )
               }
             end
           end
@@ -2078,89 +1669,6 @@ describe 'datadog_agent' do
               it {
                 is_expected.to contain_file(config_yaml_file).with(
                   'content' => %r{^\ \ apm_non_local_traffic: true\n},
-                )
-              }
-            end
-
-            context 'with apm_enabled set to true and apm_analyzed_spans specified' do
-              let(:params) do
-                {
-                  apm_enabled: true,
-                  apm_analyzed_spans: {
-                    'foo|bar' => 0.5,
-                    'haz|qux' => 0.1,
-                  },
-                }
-              end
-
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^apm_config:\n},
-                )
-              }
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^apm_config:\n\ \ enabled: true\n},
-                )
-              }
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^\ \ analyzed_spans:\n\ \ \ \ foo|bar: 0.5\n\ \ \ \ haz|qux: 0.1\n},
-                )
-              }
-            end
-
-            context 'with apm_enabled set to true and apm_obfuscation specified' do
-              let(:params) do
-                {
-                  apm_enabled: true,
-                  apm_obfuscation: {
-                    elasticsearch: {
-                      enable: true,
-                      keep_values: [
-                        'user_id',
-                        'category_id',
-                      ],
-                    },
-                    redis: {
-                      enable: true,
-                    },
-                    memcached: {
-                      enable: true,
-                    },
-                    http: {
-                      remove_query_string: true,
-                      remove_paths_with_digits: true,
-                    },
-                    mongodb: {
-                      enable: true,
-                      keep_values: [
-                        'uid',
-                        'cat_id',
-                      ],
-                    },
-                  },
-                }
-              end
-
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^apm_config:\n},
-                )
-              }
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^apm_config:\n\ \ enabled: true\n},
-                )
-              }
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^\ \ obfuscation:\n},
-                )
-              }
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{elasticsearch},
                 )
               }
             end
@@ -2282,7 +1790,7 @@ describe 'datadog_agent' do
               let(:params) do
                 {
                   process_enabled: true,
-                  custom_sensitive_words: ['consul_token', 'dd_key'],
+                  custom_sensitive_words: ['dd_key'],
                 }
               end
 
@@ -2299,11 +1807,6 @@ describe 'datadog_agent' do
               it {
                 is_expected.to contain_file(config_yaml_file).with(
                   'content' => %r{^\ \ scrub_args: true\n},
-                )
-              }
-              it {
-                is_expected.to contain_file(config_yaml_file).with(
-                  'content' => %r{^\ \ -\ consul_token\n},
                 )
               }
               it {

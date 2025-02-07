@@ -90,13 +90,13 @@ class datadog_agent::integrations::tcp_check (
   String $check_name,
   String $host,
   String $port,
-  Integer $timeout                          = 10,
-  Optional[Integer] $threshold              = undef,
-  Optional[Integer] $window                 = undef,
-  Optional[Integer] $collect_response_time  = undef,
-  Optional[Integer] $skip_event             = undef,
-  Array $tags                = [],
-  Optional[Array] $instances = undef,
+  Integer $timeout                         = 10,
+  Optional[Integer] $threshold             = undef,
+  Optional[Integer] $window                = undef,
+  Optional[Integer] $collect_response_time = undef,
+  Optional[Integer] $skip_event            = undef,
+  Array $tags                              = [],
+  Optional[Array] $instances               = undef,
 ) inherits datadog_agent::params {
   require datadog_agent
 
@@ -118,25 +118,17 @@ class datadog_agent::integrations::tcp_check (
     $_instances = $instances
   }
 
-  $legacy_dst = "${datadog_agent::params::legacy_conf_dir}/tcp_check.yaml"
-  if $datadog_agent::_agent_major_version > 5 {
-    $dst_dir = "${datadog_agent::params::conf_dir}/tcp_check.d"
-    file { $legacy_dst:
-      ensure => 'absent',
-    }
+  $dst_dir = "${datadog_agent::params::conf_dir}/tcp_check.d"
 
-    file { $dst_dir:
-      ensure  => directory,
-      owner   => $datadog_agent::dd_user,
-      group   => $datadog_agent::params::dd_group,
-      mode    => $datadog_agent::params::permissions_directory,
-      require => Package[$datadog_agent::params::package_name],
-      notify  => Service[$datadog_agent::params::service_name],
-    }
-    $dst = "${dst_dir}/conf.yaml"
-  } else {
-    $dst = $legacy_dst
+  file { $dst_dir:
+    ensure  => directory,
+    owner   => $datadog_agent::dd_user,
+    group   => $datadog_agent::params::dd_group,
+    mode    => $datadog_agent::params::permissions_directory,
+    require => Package[$datadog_agent::params::package_name],
+    notify  => Service[$datadog_agent::params::service_name],
   }
+  $dst = "${dst_dir}/conf.yaml"
 
   file { $dst:
     ensure  => file,
