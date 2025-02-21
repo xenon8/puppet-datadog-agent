@@ -72,64 +72,34 @@ platforms:
     - gem install bundler -v '= 2.4.13'
     - cd /home && bundle install
     - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
+    # - name: centos-stream9-puppet-8
+    #   driver:
+    #     image: 'trfore/docker-centos9-systemd'
+    #     platform: centosstream
+    #     docker_platform: linux/amd64
+    #     use_sudo: true
+    #     privileged: true
+    #     run_options: --cgroupns=host --tmpfs=/run --tmpfs=/tmp --volume=/sys/fs/cgroup:/sys/fs/cgroup:rw
+    #     provision_command:
+    #     - dnf module -y reset ruby
+    #     - dnf module -y enable ruby:3.1
+    #     - dnf module -y install ruby:3.1/common
 
-# mirrorlist.centos.org is no longer available for <= centos8/centos-stream8
-# - name: centos-stream8-puppet-8 
-#   driver_config:
-#     image: 'quay.io/centos/centos:stream9'
-#     platform: centosstream
-#   driver:
-#     use_sudo: true
-#     privileged: true
-#     provision_command:
-#     - rpm -Uvh https://yum.puppet.com/puppet8-release-el-8.noarch.rpm #installs the puppet-agent repo
-#     - yum install -y puppet-agent rubygems ruby-devel make gcc
-#     - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
+    #     - rpm -Uvh https://yum.puppet.com/puppet8-release-el-9.noarch.rpm #installs the puppet-agent repo
+    #     - yum install -y puppet-agent-8.10.0 rubygems ruby-devel procps-ng
+    #     - dnf group install -y "Development Tools"
+    #     - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
 
-#     - mkdir /home/kitchen/puppet -p
-#     - printf <%= File.read('environments/etc/Puppetfile').inspect %> > /home/kitchen/puppet/Puppetfile
-#     - printf <%= File.read('environments/etc/Gemfile').inspect %> > /home/Gemfile
+    #     - mkdir /home/kitchen/puppet -p
+    #     - printf <%= File.read('environments/etc/Puppetfile').inspect %> > /home/kitchen/puppet/Puppetfile
+    #     - printf <%= File.read('environments/etc/Gemfile').inspect %> > /home/Gemfile
 
-#     - gem install bundler -v '= 2.4.13'
-#     # we use bundle to install gems and to lock dependencies versions of semantic_puppet and multipart-post
-#     - cd /home && bundle install
-#     - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
+    #     - gem install bundler -v '= 2.4.13'
+    #     # we use bundle to install gems and to lock dependencies versions of semantic_puppet and multipart-post
+    #     - cd /home && bundle install
+    #     - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
 
 
-# TODO: validate module support for CentOS Stream
-#       Debug: Service[datadog-agent](provider=base): Executing 'ps -ef'
-#       Debug: Executing: 'ps -ef'
-#       Error: /Service[datadog-agent]: Could not evaluate: Execution of 'ps -ef' returned 1: Error: Could not execute posix command: No such file or directory - ps
-#       Debug: Service[datadog-agent](provider=base): Executing 'ps -ef'
-#       Debug: Executing: 'ps -ef'
-#       Error: /Service[datadog-agent]: Failed to call refresh: Execution of 'ps -ef' returned 1: Error: Could not execute posix command: No such file or directory - ps
-#       Error: /Service[datadog-agent]: Execution of 'ps -ef' returned 1: Error: Could not execute posix command: No such file or directory - ps
-- name: centos-stream9-puppet-8
-  driver:
-    image: 'trfore/docker-centos9-systemd'
-    platform: centosstream
-    docker_platform: linux/amd64
-    use_sudo: true
-    privileged: true
-    run_options: --cgroupns=host --tmpfs=/run --tmpfs=/tmp --volume=/sys/fs/cgroup:/sys/fs/cgroup:rw
-    provision_command:
-    # - dnf module -y reset ruby
-    # - dnf module -y enable ruby:3.1
-    # - dnf module -y install ruby:3.1/common
-
-    - rpm -Uvh https://yum.puppet.com/puppet8-release-el-9.noarch.rpm #installs the puppet-agent repo
-    - yum install -y puppet-agent-8.10.0 rubygems ruby-devel procps-ng
-    - dnf group install -y "Development Tools"
-    - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
-
-    - mkdir /home/kitchen/puppet -p
-    - printf <%= File.read('environments/etc/Puppetfile').inspect %> > /home/kitchen/puppet/Puppetfile
-    - printf <%= File.read('environments/etc/Gemfile').inspect %> > /home/Gemfile
-
-    - gem install bundler -v '= 2.4.13'
-    # we use bundle to install gems and to lock dependencies versions of semantic_puppet and multipart-post
-    - cd /home && bundle install
-    - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
     # TODO: validate module support for Rocky Linux
     #       Debug: Service[datadog-agent](provider=base): Executing 'ps -ef'
     #       Debug: Executing: 'ps -ef'
