@@ -42,7 +42,7 @@ platforms:
     - wget https://apt.puppet.com/puppet8-release-jammy.deb
     - dpkg -i puppet8-release-jammy.deb #installs the puppet-agent repo
     - apt-get update
-    - apt-get install -y puppet-agent rubygems ruby-dev make gcc
+    - apt-get install -y puppet-agent-8.10.0-1 rubygems ruby-dev make gcc
     - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
 
     - mkdir /home/kitchen/puppet -p
@@ -53,16 +53,16 @@ platforms:
     - cd /home && bundle install
     - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
 
-- name: ubuntu-20.04-puppet-8
+- name: ubuntu-20.04-puppet-7
   driver:
     image: 'ubuntu:20.04'
     docker_platform: linux/amd64
     provision_command:
     - apt-get install -y apt-utils apt-transport-https ca-certificates make gcc
-    - wget https://apt.puppet.com/puppet8-release-focal.deb
+    - wget https://apt.puppet.com/puppet7-release-focal.deb
     - dpkg -i puppet8-release-focal.deb #installs the puppet-agent repo
     - apt-get update
-    - apt-get install -y puppet-agent rubygems ruby-dev
+    - apt-get install -y puppet-agent-7.34.0-1 rubygems ruby-dev
     - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
 
     - mkdir /home/kitchen/puppet
@@ -72,34 +72,33 @@ platforms:
     - gem install bundler -v '= 2.4.13'
     - cd /home && bundle install
     - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
-    # - name: centos-stream9-puppet-8
-    #   driver:
-    #     image: 'trfore/docker-centos9-systemd'
-    #     platform: centosstream
-    #     docker_platform: linux/amd64
-    #     use_sudo: true
-    #     privileged: true
-    #     run_options: --cgroupns=host --tmpfs=/run --tmpfs=/tmp --volume=/sys/fs/cgroup:/sys/fs/cgroup:rw
-    #     provision_command:
-    #     - dnf module -y reset ruby
-    #     - dnf module -y enable ruby:3.1
-    #     - dnf module -y install ruby:3.1/common
 
-    #     - rpm -Uvh https://yum.puppet.com/puppet8-release-el-9.noarch.rpm #installs the puppet-agent repo
-    #     - yum install -y puppet-agent-8.10.0 rubygems ruby-devel procps-ng
-    #     - dnf group install -y "Development Tools"
-    #     - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
+- name: centos-stream9-puppet-8
+  driver:
+    image: 'trfore/docker-centos9-systemd'
+    platform: centosstream
+    docker_platform: linux/amd64
+    use_sudo: true
+    privileged: true
+    run_options: --cgroupns=host --tmpfs=/run --tmpfs=/tmp --volume=/sys/fs/cgroup:/sys/fs/cgroup:rw
+    provision_command:
+    - dnf module -y reset ruby
+    - dnf module -y enable ruby:3.1
+    - dnf module -y install ruby:3.1/common
 
-    #     - mkdir /home/kitchen/puppet -p
-    #     - printf <%= File.read('environments/etc/Puppetfile').inspect %> > /home/kitchen/puppet/Puppetfile
-    #     - printf <%= File.read('environments/etc/Gemfile').inspect %> > /home/Gemfile
+    - rpm -Uvh https://yum.puppet.com/puppet8-release-el-9.noarch.rpm #installs the puppet-agent repo
+    - yum install -y puppet-agent-8.10.0 rubygems ruby-devel procps-ng
+    - dnf group install -y "Development Tools"
+    - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
 
-    #     - gem install bundler -v '= 2.4.13'
-    #     # we use bundle to install gems and to lock dependencies versions of semantic_puppet and multipart-post
-    #     - cd /home && bundle install
-    #     - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
+    - mkdir /home/kitchen/puppet -p
+    - printf <%= File.read('environments/etc/Puppetfile').inspect %> > /home/kitchen/puppet/Puppetfile
+    - printf <%= File.read('environments/etc/Gemfile').inspect %> > /home/Gemfile
 
-
+    - gem install bundler -v '= 2.4.13'
+    # we use bundle to install gems and to lock dependencies versions of semantic_puppet and multipart-post
+    - cd /home && bundle install
+    - cd /home/kitchen/puppet && r10k puppetfile install --moduledir=/tmp/modules
     # TODO: validate module support for Rocky Linux
     #       Debug: Service[datadog-agent](provider=base): Executing 'ps -ef'
     #       Debug: Executing: 'ps -ef'
