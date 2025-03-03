@@ -60,7 +60,7 @@ platforms:
     provision_command:
     - apt-get install -y apt-utils apt-transport-https ca-certificates make gcc
     - wget https://apt.puppet.com/puppet7-release-focal.deb
-    - dpkg -i puppet8-release-focal.deb #installs the puppet-agent repo
+    - dpkg -i puppet7-release-focal.deb #installs the puppet-agent repo
     - apt-get update
     - apt-get install -y puppet-agent-7.34.0-1 rubygems ruby-dev
     - ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet
@@ -75,12 +75,13 @@ platforms:
 
 - name: centos-stream9-puppet-8
   driver:
-    image: 'trfore/docker-centos9-systemd'
+    image: 'datadog/docker-library:chef_kitchen_systemd_centos_9'
     platform: centosstream
     docker_platform: linux/amd64
-    use_sudo: true
     privileged: true
-    run_options: --cgroupns=host --tmpfs=/run --tmpfs=/tmp --volume=/sys/fs/cgroup:/sys/fs/cgroup:rw
+    run_options: --cgroupns=host --tmpfs=/run --volume=/sys/fs/cgroup:/sys/fs/cgroup:rw
+    publish_all: true
+    run_command: /root/start.sh
     provision_command:
     - dnf module -y reset ruby
     - dnf module -y enable ruby:3.1
