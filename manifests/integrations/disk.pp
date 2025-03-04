@@ -2,6 +2,9 @@
 #
 # This class will install the necessary config to hook the disk check
 #
+# See the sample disk.d/conf.yaml for all available configuration options
+# https://github.com/DataDog/integrations-core/blob/master/disk/datadog_checks/disk/data/conf.yaml.default
+#
 # Parameters:
 #   $use_mount
 #       The use_mount parameter will instruct the check to collect disk
@@ -60,9 +63,9 @@
 #      excluded_disk_re     => '/dev/sd[e-z]*'
 #  }
 class datadog_agent::integrations::disk (
-  String $use_mount                              = 'no',
-  Optional[String] $all_partitions               = undef,
-  Optional[String] $tag_by_filesystem            = undef,
+  Optional[Boolean] $use_mount                   = undef,
+  Optional[Boolean] $all_partitions              = undef,
+  Optional[Boolean] $tag_by_filesystem           = undef,
   Optional[Array[String]] $filesystem_exclude    = undef,
   Optional[Array[String]] $device_exclude        = undef,
   Optional[Array[String]] $mountpoint_exclude    = undef,
@@ -81,12 +84,6 @@ class datadog_agent::integrations::disk (
   Optional[String] $excluded_mountpoint_re = undef,  # deprecated in agent versions >6.9
 ) inherits datadog_agent::params {
   require datadog_agent
-
-  validate_legacy('Optional[String]', 'validate_re', $all_partitions, '^(no|yes)$')
-
-  if $use_mount !~ '^(no|yes)$' {
-    fail('error during compilation')
-  }
 
   $legacy_dst = "${datadog_agent::params::legacy_conf_dir}/disk.yaml"
   if $datadog_agent::_agent_major_version > 5 {

@@ -11,7 +11,6 @@
 /bin/
 /doc/
 /Gemfile.local
-/Gemfile.lock
 /junit/
 /log/
 /pkg/
@@ -36,7 +35,6 @@ environments/**/.vagrant
 /inventory.yaml
 
 .kitchen
-.vscode
 
 /spec/fixtures/litmus_inventory.yaml
 .resource_types

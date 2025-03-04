@@ -2,12 +2,15 @@
 #
 # This class will install the necessary config to hook the http_check in the agent
 #
+# See the sample http_check.d/conf.yaml for all available configuration options
+# https://github.com/DataDog/integrations-core/blob/master/http_check/datadog_checks/http_check/data/conf.yaml.example
+#
 # Parameters:
 #   sitename
-#       (Required) The name of the instance.
+#       The name of the instance.
 #
 #   url
-#       (Required) The url to check.
+#       The url to check.
 #
 #   timeout
 #       The (optional) timeout in seconds.
@@ -98,7 +101,8 @@
 #       left in the certificate, and alternatively raise a critical
 #       warning if the certificate is y days from the expiration date.
 #       The SSL certificate will always be validated for this additional
-#       service check regardless of the value of disable_ssl_validation
+#       service check regardless of the value of disable_ssl_validation.
+#       check_certification_expiration defaults to true.
 #
 #   headers
 #       The (optional) headers parameter allows you to send extra headers with
@@ -166,8 +170,8 @@
 #        }]
 #     }
 class datadog_agent::integrations::http_check (
-  String $sitename,
-  String $url,
+  Optional[String] $sitename = undef,
+  Optional[String] $url = undef,
   Optional[String] $username  = undef,
   Optional[Any] $password  = undef,
   Integer $timeout   = 1,

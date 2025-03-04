@@ -2,6 +2,9 @@
 #
 # This class will install the necessary configuration for the postgres integration
 #
+# See the sample postgres.d/conf.yaml for all available configuration options
+# https://github.com/DataDog/integrations-core/blob/master/postgres/datadog_checks/postgres/data/conf.yaml.example
+#
 # Parameters:
 #   $password
 #       The password for the datadog user
@@ -14,7 +17,19 @@
 #   $username
 #       The username for the datadog user
 #   $ssl
-#       Boolean to enable SSL
+#       This option determines whether or not and with what priority a secure SSL TCP/IP connection
+#         is negotiated with the server. There are six modes:
+#         - `disable`: Only tries a non-SSL connection.
+#         - `allow`: First tries a non-SSL connection; if if fails, tries an SSL connection.
+#         - `prefer`: First tries an SSL connection; if it fails, tries a non-SSL connection.
+#         - `require`: Only tries an SSL connection. If a root CA file is present, verifies the certificate in
+#                      the same way as if verify-ca was specified.
+#         - `verify-ca`: Only tries an SSL connection, and verifies that the server certificate is issued by a
+#                        trusted certificate authority (CA).
+#         - `verify-full`: Only tries an SSL connection and verifies that the server certificate is issued by a
+#                          trusted CA and that the requested server host name matches the one in the certificate.
+#
+#         For a detailed description of how these options work see https://www.postgresql.org/docs/current/libpq-ssl.html
 #   $use_psycopg2
 #       Boolean to flag connecting to postgres with psycopg2 instead of pg8000.
 #       Warning, psycopg2 doesn't support ssl mode.
@@ -38,10 +53,6 @@
 #       (10 + 10 per index)
 #   $tags
 #       Optional array of tags
-#   $custom_metrics
-#       A hash of custom metrics with the following keys - query, metrics,
-#       relation, descriptors. Refer to this guide for details on those fields:
-#       https://help.datadoghq.com/hc/en-us/articles/208385813-Postgres-custom-metric-collection-explained
 #
 # Sample Usage:
 #
@@ -51,18 +62,6 @@
 #    username => 'datadog',
 #    password => 'some_pass',
 #    ssl      => false,
-#    custom_metrics => {
-#      a_custom_query => {
-#        query => "select tag_column, %s from table",
-#        relation => false,
-#        metrics => {
-#          value_column => ["value_column.datadog.tag", "GAUGE"]
-#        },
-#        descriptors => [
-#          ["tag_column", "tag_column.datadog.tag"]
-#        ]
-#      }
-#    }
 #  }
 #
 # Hiera Usage:
@@ -72,7 +71,7 @@
 #       dbname: 'postgres'
 #       username: 'datadog'
 #       password: 'some_pass'
-#       ssl: false
+#       ssl: 'allow'
 #       custom_metrics:
 #         a_custom_query:
 #           query: 'select tag_column, %s from table'
@@ -88,7 +87,7 @@ class datadog_agent::integrations::postgres (
   String $dbname                         = 'postgres',
   Variant[String, Integer] $port         = '5432',
   String $username                       = 'datadog',
-  Boolean $ssl                           = false,
+  String $ssl                            = 'allow',
   Boolean $use_psycopg2                  = false,
   Boolean $collect_function_metrics      = false,
   Boolean $collect_count_metrics         = false,
@@ -97,7 +96,6 @@ class datadog_agent::integrations::postgres (
   Boolean $collect_default_database      = false,
   Array[String] $tags                    = [],
   Array[String] $tables                  = [],
-  Hash $custom_metrics                   = {},
   Optional[Array] $instances             = undef,
 ) inherits datadog_agent::params {
   require datadog_agent
@@ -133,7 +131,6 @@ class datadog_agent::integrations::postgres (
         'use_psycopg2'                  => $use_psycopg2,
         'tags'                          => $tags,
         'tables'                        => $tables,
-        'custom_metrics'                => $custom_metrics,
         'collect_function_metrics'      => $collect_function_metrics,
         'collect_count_metrics'         => $collect_count_metrics,
         'collect_activity_metrics'      => $collect_activity_metrics,
@@ -155,6 +152,4 @@ class datadog_agent::integrations::postgres (
     require => Package[$datadog_agent::params::package_name],
     notify  => Service[$datadog_agent::params::service_name],
   }
-
-  create_resources('datadog_agent::integrations::postgres_custom_metric', $custom_metrics)
 }
